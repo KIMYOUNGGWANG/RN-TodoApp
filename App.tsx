@@ -12,6 +12,9 @@ import {
   KeyboardAvoidingView,
   // useColorScheme,
   Platform,
+  TouchableOpacity,
+  Text,
+  View,
 } from 'react-native';
 
 // import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -21,7 +24,10 @@ import AddTodo from './components/AddTodo';
 import Empty from './components/Empty';
 import TodoList from './components/TodoList';
 import todosStroage from './storages/todosStorage';
-import AsyncStorage from '@react-native-community/async-storage';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import HomeScreen from './screens/HomeScreen';
+import DetailScreen from './screens/DetailScreen';
 
 // type SectionProps = PropsWithChildren<{
 //   title: string;
@@ -54,57 +60,98 @@ import AsyncStorage from '@react-native-community/async-storage';
 // }
 
 function App(): JSX.Element {
-  const [todos, setTodos] = useState([
-    {id: 1, text: '작업환경 설정', done: true},
-    {id: 2, text: 'RN basic', done: false},
-    {id: 3, text: 'make TodoList', done: false},
-  ]);
-  const idRef = useRef(4);
-  const addTodoListHandler = (todo: string) => {
-    setTodos(prev => [...prev, {id: idRef.current, text: todo, done: false}]);
-    idRef.current++;
-  };
+  const Stack = createNativeStackNavigator();
+  // const [todos, setTodos] = useState([
+  //   {id: 1, text: '작업환경 설정', done: true},
+  //   {id: 2, text: 'RN basic', done: false},
+  //   {id: 3, text: 'make TodoList', done: false},
+  // ]);
+  // const idRef = useRef(4);
+  // const addTodoListHandler = (todo: string) => {
+  //   setTodos(prev => [...prev, {id: idRef.current, text: todo, done: false}]);
+  //   idRef.current++;
+  // };
 
-  const onToggleHandler = (id: number) => {
-    const modify = todos.map(todo => {
-      return todo.id === id ? {...todo, done: !todo.done} : todo;
-    });
-    setTodos(modify);
-  };
+  // const onToggleHandler = (id: number) => {
+  //   const modify = todos.map(todo => {
+  //     return todo.id === id ? {...todo, done: !todo.done} : todo;
+  //   });
+  //   setTodos(modify);
+  // };
 
-  const onRemoveHandler = (id: number) => {
-    const removeTodo = todos.filter(todo => todo.id !== id);
-    setTodos(removeTodo);
-  };
+  // const onRemoveHandler = (id: number) => {
+  //   const removeTodo = todos.filter(todo => todo.id !== id);
+  //   setTodos(removeTodo);
+  // };
 
-  useEffect(() => {
-    todosStroage.get().then(setTodos).catch(console.error);
-  }, []);
-  useEffect(() => {
-    todosStroage.save(todos).catch(console.error);
-  }, [todos]);
+  // useEffect(() => {
+  //   todosStroage.get().then(setTodos).catch(console.error);
+  // }, []);
+  // useEffect(() => {
+  //   todosStroage.save(todos).catch(console.error);
+  // }, [todos]);
   // const isDarkMode = useColorScheme() === 'dark';
 
   // const backgroundStyle = {
   //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   // };
   return (
-    <SafeAreaProvider>
-      <SafeAreaView edges={['bottom']} style={styles.block}>
-        <KeyboardAvoidingView
-          behavior={Platform.select({ios: 'padding'})}
-          style={styles.avoid}>
-          <DateHead />
-          {todos.length === 0 && <Empty />}
-          <TodoList
-            todos={todos}
-            onToggleHandler={onToggleHandler}
-            onRemoveHandler={onRemoveHandler}
-          />
-          <AddTodo addTodoListHandler={addTodoListHandler} />
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: '홈',
+            headerStyle: {
+              backgroundColor: '#29b6f6',
+            },
+            headerTintColor: '#ffffff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+              fontSize: 20,
+            },
+          }}
+        />
+        <Stack.Screen
+          name="Detail"
+          component={DetailScreen}
+          options={{
+            headerLeft: ({onPress}) => (
+              <TouchableOpacity onPress={onPress}>
+                <Text>Left</Text>
+              </TouchableOpacity>
+            ),
+            headerTitle: ({children}) => (
+              <View>
+                <Text>{children}</Text>
+              </View>
+            ),
+            headerRight: () => (
+              <View>
+                <Text>Right</Text>
+              </View>
+            ),
+          }}
+        />
+      </Stack.Navigator>
+      {/* <SafeAreaProvider>
+        <SafeAreaView edges={['bottom']} style={styles.block}>
+          <KeyboardAvoidingView
+            behavior={Platform.select({ios: 'padding'})}
+            style={styles.avoid}>
+            <DateHead />
+            {todos.length === 0 && <Empty />}
+            <TodoList
+              todos={todos}
+              onToggleHandler={onToggleHandler}
+              onRemoveHandler={onRemoveHandler}
+            />
+            <AddTodo addTodoListHandler={addTodoListHandler} />
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </SafeAreaProvider> */}
+    </NavigationContainer>
   );
 }
 
