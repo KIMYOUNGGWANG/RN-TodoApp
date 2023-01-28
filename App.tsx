@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   Text,
   View,
+  Button,
 } from 'react-native';
 
 // import {Colors} from 'react-native/Libraries/NewAppScreen';
@@ -24,11 +25,15 @@ import AddTodo from './components/AddTodo';
 import Empty from './components/Empty';
 import TodoList from './components/TodoList';
 import todosStroage from './storages/todosStorage';
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  getFocusedRouteNameFromRoute,
+  NavigationContainer,
+} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from './screens/HomeScreen';
 import DetailScreen from './screens/DetailScreen';
-
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import MainScreen from './screens/MainScreen';
 // type SectionProps = PropsWithChildren<{
 //   title: string;
 // }>;
@@ -95,10 +100,20 @@ function App(): JSX.Element {
   // const backgroundStyle = {
   //   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   // };
+  const getHeaderTitle = route => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+    const nameMap = {
+      Home: '홈',
+      Search: '검색',
+      Message: '메세지',
+      Notification: '알림',
+    };
+    return nameMap[routeName];
+  };
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
+        {/* <Stack.Screen
           name="Home"
           component={HomeScreen}
           options={{
@@ -111,6 +126,16 @@ function App(): JSX.Element {
               fontWeight: 'bold',
               fontSize: 20,
             },
+          }}
+        /> */}
+        <Stack.Screen
+          name="Main"
+          component={MainScreen}
+          options={({route}) => {
+            return {
+              headerShown: false,
+              title: getHeaderTitle(route),
+            };
           }}
         />
         <Stack.Screen
@@ -135,6 +160,7 @@ function App(): JSX.Element {
           }}
         />
       </Stack.Navigator>
+
       {/* <SafeAreaProvider>
         <SafeAreaView edges={['bottom']} style={styles.block}>
           <KeyboardAvoidingView
